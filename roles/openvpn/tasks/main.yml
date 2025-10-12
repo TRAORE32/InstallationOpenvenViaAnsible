@@ -1,0 +1,43 @@
+---
+- name: Mise à jour du système
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Installation des dépendances
+  apt:
+    name:
+      - wget
+      - curl
+      - net-tools
+    state: present
+
+- name: Téléchargement du script OpenVPN officiel
+  get_url:
+    url: https://git.io/vpn
+    dest: /root/openvpn-install.sh
+    mode: '0755'
+
+- name: Exécution automatique du script OpenVPN
+  shell: |
+    AUTO_INSTALL=y \
+    APPROVE_INSTALL=y \
+    APPROVE_IP=y \
+    IPV6_SUPPORT=n \
+    PORT_CHOICE=1 \
+    PROTOCOL_CHOICE=1 \
+    DNS=1 \
+    COMPRESSION_ENABLED=n \
+    CUSTOMIZE_ENC=n \
+    CLIENT={{ openvpn_client_name }} \
+    PASS=1 \
+    ./openvpn-install.sh
+  args:
+    chdir: /root
+    creates: "/root/{{ openvpn_client_name }}.ovpn"
+
+- name: Récupération du fichier client
+  fetch:
+    src: "/root/{{ openvpn_client_name }}.ovpn"
+    dest: "./{{ openvpn_client_name }}.ovpn"
+    flat: yes
