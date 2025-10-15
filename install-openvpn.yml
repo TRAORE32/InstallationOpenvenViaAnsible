@@ -1,0 +1,9 @@
+---
+- name: Installation automatique d'OpenVPN sur Ubuntu
+  hosts: openvpn_servers
+  become: true
+  vars:
+    openvpn_client_name: client1
+  roles:
+    - openvpn
+
